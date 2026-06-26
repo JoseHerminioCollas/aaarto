@@ -63,6 +63,7 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
     );
 
     // 👇 Estimate gas first
+    // TODO reset this to use default action, provide message to user if they have insufficient funds,  
     // const gasLimit = await AaartoNFTContract.preSafeMint.estimateGas(
     //   userAccount,
     //   ipfsTokenURI,
@@ -73,6 +74,7 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
     const txResponse: TransactionResponse = await AaartoNFTContract.preSafeMint(
       userAccount,
       ipfsTokenURI,
+      // { value: platformFee },      
       { value: platformFee, gasLimit },
     );
 
