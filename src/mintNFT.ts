@@ -29,11 +29,13 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
       throw new Error(errorMessages.notInstalled);
     }
     console.log("Coinbase Wallet is available.");
+
     const userAccounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
     const userAccount = userAccounts[0];
     console.log("User account:", userAccount);
+
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
 
@@ -60,22 +62,22 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
       signer,
     );
 
+    // 👇 Estimate gas first
+    // const gasLimit = await AaartoNFTContract.preSafeMint.estimateGas(
+    //   userAccount,
+    //   ipfsTokenURI,
+    //   { value: platformFee },
+    // );
+    const gasLimit = 300000; // pick a safe default
+    // 👇 Pass gasLimit so wallet opens even if funds are low
     const txResponse: TransactionResponse = await AaartoNFTContract.preSafeMint(
       userAccount,
       ipfsTokenURI,
-      { value: platformFee },
+      { value: platformFee, gasLimit },
     );
 
-    // Fix: assert non-null receipt
-    // const receipt = (await txResponse.wait()) as TransactionReceipt;
-    // if (!receipt || !receipt.hash) {
-    //   throw new Error("Transaction has not been successful");
-    // }
-    const receipt = await txResponse.wait();
-    if (!receipt) {
-      throw new Error("Transaction receipt is null");
-    }
-    if (!receipt.hash) {
+    const receipt: TransactionReceipt | null = await txResponse.wait();
+    if (!receipt || !receipt.hash) {
       throw new Error("Transaction has not been successful");
     }
     return receipt.hash;
@@ -83,7 +85,6 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
     console.error("Minting error:", error);
     if (error instanceof Error) {
       if (error.message.includes("insufficient funds")) {
-        console.error("Minting error:", error);
         throw new Error("Insufficient funds for minting.");
       }
       if (error.message.includes("user rejected action")) {
@@ -91,9 +92,8 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
       }
       if (error.message.includes("successful")) {
         throw error;
-      } else {
-        throw new Error(errorMessages.general);
       }
+      throw new Error(errorMessages.general);
     }
   }
 };
