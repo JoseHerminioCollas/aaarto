@@ -9,8 +9,6 @@
   "dependencies": {
     "@coinbase/wallet-sdk": "^4.3.7",
     "@fluentui/react": "^8.122.10",
-    "@metamask/sdk": "^0.31.4",
-    "@metamask/utils": "^11.0.1",
     "@testing-library/dom": "^10.4.0",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",

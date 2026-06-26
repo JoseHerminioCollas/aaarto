@@ -28,12 +28,12 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
     if (!ethereum) {
       throw new Error(errorMessages.notInstalled);
     }
-
+    console.log("Coinbase Wallet is available.");
     const userAccounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
     const userAccount = userAccounts[0];
-
+    console.log("User account:", userAccount);
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
 
@@ -79,9 +79,13 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
       throw new Error("Transaction has not been successful");
     }
     return receipt.hash;
-
   } catch (error: unknown) {
+    console.error("Minting error:", error);
     if (error instanceof Error) {
+      if (error.message.includes("insufficient funds")) {
+        console.error("Minting error:", error);
+        throw new Error("Insufficient funds for minting.");
+      }
       if (error.message.includes("user rejected action")) {
         throw new Error(errorMessages.userCancel);
       }
