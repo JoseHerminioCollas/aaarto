@@ -61,13 +61,14 @@ const App: React.FC = () => {
     setAccount(null);
     setTransactionHash(null);
     setMintingError(null);
+    const ipfsHashMD = 'x';
     try {
-      const ipfsHashMD = await uploadData(
-        svgString,
-        name,
-        description,
-        artistName
-      );
+      // const ipfsHashMD = await uploadData(
+      //   svgString,
+      //   name,
+      //   description,
+      //   artistName
+      // );
       // Check if MetaMask is installed, if not throw error
       checkMetaMaskInstall();
       // Get the users account
