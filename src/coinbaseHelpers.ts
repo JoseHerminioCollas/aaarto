@@ -46,23 +46,21 @@ export async function connectCoinbaseWallet() {
     appLogoUrl: "https://aaarto.art/logo.png",
   });
 
-  const ethereum = getCoinbaseProvider() 
-    ?? (coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider);
+  const ethereum =
+    getCoinbaseProvider() ??
+    (coinbaseWallet.makeWeb3Provider(
+      config.rpcUrl,
+    ) as CoinbaseEthereumProvider);
 
   console.log("Connecting with Coinbase provider:", ethereum);
 
-  try {
-    const accounts = (await ethereum.request({
-      method: "eth_requestAccounts",
-    })) as string[];
+  const accounts = (await ethereum.request({
+    method: "eth_requestAccounts",
+  })) as string[];
 
-    if (!accounts || accounts.length === 0) {
-      return { status: "no_accounts", ethereum };
-    }
-
-    return { status: "connected", ethereum, account: accounts[0] };
-  } catch (err: any) {
-    console.error("Coinbase Wallet not responding", err);
-    return { status: "not_installed", ethereum };
+  if (!accounts || accounts.length === 0) {
+    throw new Error("no_accounts");
   }
+
+  return { ethereum, account: accounts[0] };
 }

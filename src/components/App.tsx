@@ -92,47 +92,17 @@ const App: React.FC = () => {
       // );
 
       const result = await connectCoinbaseWallet();
-// TODO this will not happen
-      if (result.status === "not_installed") {
-        console.log('not installed', result.status)
-        setMintingError(normalizeMintError({message:result.status}, errorMessages));
-        //setErrorMessage(errorMessages.notInstalled);
-        //setShowNoWallet(true); // open your NoWallet modal
-        return;
-      }
+      // Only runs if connected
+      const txHash = await mintNFT(
+        result.ethereum,
+        result.account,
+        `ipfs://${ipfsHashMD}`,
+      );
+      setTransactionHash(txHash);
 
-      if (result.status === "no_accounts") {
-        setMintingError(normalizeMintError(result.status, errorMessages));
-        //setErrorMessage(errorMessages.noAccounts);
-        return;
-      }
-
-      if (result.status === "connected") {
-        setMintingError(normalizeMintError(result.status, errorMessages));
-        //setAccount(result.account);
-        const txHash = await mintNFT(
-          result.ethereum,
-          result.account as any,
-          `ipfs://${ipfsHashMD}`,
-        );
-        setTransactionHash(txHash);
-      }
-
-      // const { ethereum, account } = await connectCoinbaseWallet();
-      // setAccount(account);
-      // const txHash = await mintNFT(ethereum, account, `ipfs://${ipfsHashMD}`);
-      // setTransactionHash(txHash);
-
-      // checkCoinbaseInstall();
-      // const account = await requestAccounts();
-      // setAccount(account);
-      // const transactionHash = await mintNFT(`ipfs://${ipfsHashMD}`);
-      // if (transactionHash) {
-      //   setTransactionHash(transactionHash);
-      // }
       setIsMinting(false);
     } catch (error: any) {
-      console.log('errr', error)
+      console.log("errr", error);
       setMintingError(normalizeMintError(error, errorMessages));
       setIsMinting(false);
     }
