@@ -12,6 +12,7 @@ import MintingInfo from "./MintingInfo";
 import uploadData from "../uploadData";
 import { checkCoinbaseInstall, requestAccounts } from "../coinbaseHelpers";
 import mintNFT from "../mintNFT";
+import config from "../config";
 
 const aboutStyles = mergeStyleSets({
   button: {
@@ -22,6 +23,23 @@ const aboutStyles = mergeStyleSets({
     cursor: "pointer",
   },
 });
+const errorMessages = {
+  notInstalled: "Coinbase Wallet is not available. Please install or open it.",
+  accountAccess: "Connect Coinbase Wallet account with this site.",
+  attemptAdd: `Attempting to add the ${config.chainNameDisplay} chain.`,
+  attemptSwitch: `Attempting to switch to the ${config.chainNameDisplay} chain.`,
+  general: "An error occurred during minting.",
+  userCancel: "The request has been cancelled.",
+  alreadyProcessing:
+    "Coinbase Wallet is processing a request, try opening Coinbase Wallet",
+  InsufficientFunds: "Insufficient funds, please add more funds to your wallet.",
+  };
+const normalizeMintError = (error: any, errorMessages: any): string => {
+  if (error.message?.includes("insufficient funds"))
+    return errorMessages.InsufficientFunds;
+  if (error.message?.includes("user rejected")) return errorMessages.userCancel;
+  return `errorMessages.general ${error}`;
+};
 
 const App: React.FC = () => {
   const [shape, setShape] = useState<string>("circle");
@@ -79,7 +97,8 @@ const App: React.FC = () => {
       }
       setIsMinting(false);
     } catch (error: any) {
-      setMintingError(`Minting Error: ${error.message}`);
+      setMintingError(normalizeMintError(error, errorMessages));
+      setIsMinting(false);
     }
   };
   useEffect(() => {
