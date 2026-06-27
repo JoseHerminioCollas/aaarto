@@ -92,7 +92,7 @@ const App: React.FC = () => {
       // );
 
       const result = await connectCoinbaseWallet();
-
+// TODO this will not happen
       if (result.status === "not_installed") {
         console.log('not installed', result.status)
         setMintingError(normalizeMintError({message:result.status}, errorMessages));
@@ -132,6 +132,7 @@ const App: React.FC = () => {
       // }
       setIsMinting(false);
     } catch (error: any) {
+      console.log('errr', error)
       setMintingError(normalizeMintError(error, errorMessages));
       setIsMinting(false);
     }

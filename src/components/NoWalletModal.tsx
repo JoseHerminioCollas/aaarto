@@ -57,7 +57,7 @@ const NoWallet: React.FC<NoWalletProps> = ({
         </div>
       </div>
 
-      <style jsx>{`
+      {/* <style jsx>{`
         .modal-overlay {
           position: fixed;
           top: 0;
@@ -94,7 +94,7 @@ const NoWallet: React.FC<NoWalletProps> = ({
         .secondary {
           background: #eee;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };
