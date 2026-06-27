@@ -3,7 +3,7 @@ import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import config from "./config";
 
 const errorMessages = {
-  notInstalled: "Coinbase Wallet is not installed or not detected.",
+  // notInstalled: "Coinbase Wallet is not installed or not detected.",
   alreadyProcessing:
     "Coinbase Wallet is already processing a request, try opening the Coinbase Wallet application.",
 };
@@ -19,8 +19,9 @@ const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl);
 
 // Function 1: check installation
 export const checkCoinbaseInstall = () => {
-  if (!ethereum || !ethereum.request) {
-    throw new Error(errorMessages.notInstalled);
+  const { ethereum } = window as any;
+  if (!ethereum || !ethereum.request || !ethereum.isCoinbaseWallet) {
+    throw new Error("not_installed");
   }
 };
 

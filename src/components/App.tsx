@@ -13,6 +13,7 @@ import uploadData from "../uploadData";
 import { checkCoinbaseInstall, requestAccounts } from "../coinbaseHelpers";
 import mintNFT from "../mintNFT";
 import config from "../config";
+import NoWalletModal from "./NoWalletModal";
 
 const aboutStyles = mergeStyleSets({
   button: {
@@ -38,6 +39,7 @@ const normalizeMintError = (error: any, errorMessages: any): string => {
   if (error.message?.includes("insufficient funds"))
     return errorMessages.InsufficientFunds;
   if (error.message?.includes("user rejected")) return errorMessages.userCancel;
+  if(error.message?.includes("not_installed")) return errorMessages.notInstalled;
   return `errorMessages.general ${error}`;
 };
 
@@ -86,10 +88,10 @@ const App: React.FC = () => {
       //   description,
       //   artistName
       // );
+      console.log("a");
       checkCoinbaseInstall();
-      console.log("Coinbase Wallet is installed.");
+      console.log("b");
       const account = await requestAccounts();
-      console.log("Coinbase Wallet is installed.", account);
       setAccount(account);
       const transactionHash = await mintNFT(`ipfs://${ipfsHashMD}`);
       if (transactionHash) {

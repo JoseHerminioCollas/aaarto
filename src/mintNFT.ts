@@ -13,7 +13,7 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
     appLogoUrl: "https://aaarto.art/logo.png",
   });
   const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl);
-
+  // TODO is this needed?
   if (!ethereum || !ethereum.request) {
     throw new Error("Wallet not available");
   }
