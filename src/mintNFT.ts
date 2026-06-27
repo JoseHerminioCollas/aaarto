@@ -12,7 +12,6 @@ const errorMessages = {
   alreadyProcessing:
     "Coinbase Wallet is processing a request, try opening Coinbase Wallet",
 };
-
 const contractAddress = config.contractAddress;
 const platformFee = ethers.parseEther(config.platformFee);
 
@@ -22,23 +21,16 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
       appName: "Aaarto NFT Minting",
       appLogoUrl: "https://aaarto.art/logo.png",
     });
-
     const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl);
-
     if (!ethereum) {
       throw new Error(errorMessages.notInstalled);
     }
-    console.log("Coinbase Wallet is available.");
-
     const userAccounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
     const userAccount = userAccounts[0];
-    console.log("User account:", userAccount);
-
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
-
     const { chainId } = await provider.getNetwork();
     if (chainId !== config.chainIDBigInt) {
       try {
@@ -55,29 +47,21 @@ const mintNFT = async (ipfsTokenURI: string): Promise<string | undefined> => {
         }
       }
     }
-
     const AaartoNFTContract = new ethers.Contract(
       contractAddress,
       config.contractArtifact.abi,
       signer,
     );
-
-    // 👇 Estimate gas first
-    // TODO reset this to use default action, provide message to user if they have insufficient funds,  
-    // const gasLimit = await AaartoNFTContract.preSafeMint.estimateGas(
-    //   userAccount,
-    //   ipfsTokenURI,
-    //   { value: platformFee },
-    // );
-    const gasLimit = 300000; // pick a safe default
-    // 👇 Pass gasLimit so wallet opens even if funds are low
+    const gasLimit = await AaartoNFTContract.preSafeMint.estimateGas(
+      userAccount,
+      ipfsTokenURI,
+      { value: platformFee },
+    );
     const txResponse: TransactionResponse = await AaartoNFTContract.preSafeMint(
       userAccount,
       ipfsTokenURI,
-      // { value: platformFee },      
-      { value: platformFee, gasLimit },
+      { value: platformFee },
     );
-
     const receipt: TransactionReceipt | null = await txResponse.wait();
     if (!receipt || !receipt.hash) {
       throw new Error("Transaction has not been successful");
