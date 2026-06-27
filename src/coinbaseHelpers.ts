@@ -11,28 +11,31 @@ export const connectCoinbaseWallet = async () => {
     appName: "Aaarto NFT Minting",
     appLogoUrl: "https://aaarto.art/logo.png",
   });
-    const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider;
-console.log('a')
+
+  const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider;
+console.log('a', ethereum)
+  // Show "connecting" message in UI immediately
+  // (don't return here, just inform the UI)
   if (!window.ethereum || !window.ethereum.request || !window.ethereum.isCoinbaseWallet) {
-    console.log("Coinbase Wallet extension not detected");
-    // throw new Error("not_installed");
-    // TODO show message, do not throw error
+    console.log("Extension not detected — popup will show, inform user of options");
+    // e.g. setErrorMessage("Use mobile app or install extension")
+    // but DO NOT return, let request run
   }
+console.log('b' )
+
   try {
     const accounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
-console.log('b')
+console.log('c', accounts )
 
     if (!accounts || accounts.length === 0) {
-console.log('c')
       throw new Error("no_accounts");
     }
 
-    return { ethereum, account: accounts[0] };
+    return { ethereum, account: accounts[0], status: '' };
   } catch (err: any) {
-    // If the extension isn’t installed, this request will fail
-    console.error("Coinbase Wallet extension not detected or not responding", err);
+    console.error("Coinbase Wallet extension not responding", err);
     throw new Error("not_installed");
   }
 };
