@@ -6,10 +6,13 @@ interface CoinbaseEthereumProvider {
   isCoinbaseWallet?: boolean;
 }
 
-function getCoinbaseProvider(): CoinbaseEthereumProvider | null {
+function getCoinbaseProvider(
+  openNoWalletModal: () => void,
+): CoinbaseEthereumProvider | null {
   const { ethereum } = window as any;
   if (!ethereum) {
     console.log("No Ethereum provider injected at all");
+    openNoWalletModal();
     return null;
   }
 
@@ -18,6 +21,7 @@ function getCoinbaseProvider(): CoinbaseEthereumProvider | null {
     const coinbase = ethereum.providers.find((p: any) => p.isCoinbaseWallet);
     if (!coinbase) {
       console.log("Coinbase Wallet not found among multiple providers");
+      openNoWalletModal();
     }
     return coinbase || null;
   }
@@ -27,6 +31,7 @@ function getCoinbaseProvider(): CoinbaseEthereumProvider | null {
     const coinbase = ethereum.providerMap.get("CoinbaseWallet");
     if (!coinbase) {
       console.log("Coinbase Wallet not found in providerMap");
+      openNoWalletModal();
     }
     return coinbase || null;
   }
@@ -34,20 +39,24 @@ function getCoinbaseProvider(): CoinbaseEthereumProvider | null {
   // Case: single provider injected
   if (!ethereum.isCoinbaseWallet) {
     console.log("Single provider injected, but it is not Coinbase Wallet");
+    openNoWalletModal();
     return null;
   }
 
   return ethereum as CoinbaseEthereumProvider;
 }
 
-export async function connectCoinbaseWallet() {
+export async function connectCoinbaseWallet(openNoWalletModal: {
+  (): void;
+  (): void;
+}) {
   const coinbaseWallet = new CoinbaseWalletSDK({
     appName: "Aaarto NFT Minting",
     appLogoUrl: "https://aaarto.art/logo.png",
   });
 
   const ethereum =
-    getCoinbaseProvider() ??
+    getCoinbaseProvider(openNoWalletModal) ??
     (coinbaseWallet.makeWeb3Provider(
       config.rpcUrl,
     ) as CoinbaseEthereumProvider);
