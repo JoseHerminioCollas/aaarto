@@ -6,36 +6,63 @@ interface CoinbaseEthereumProvider {
   isCoinbaseWallet?: boolean;
 }
 
-export const connectCoinbaseWallet = async () => {
+function getCoinbaseProvider(): CoinbaseEthereumProvider | null {
+  const { ethereum } = window as any;
+  if (!ethereum) {
+    console.log("No Ethereum provider injected at all");
+    return null;
+  }
+
+  // Case: multiple providers injected
+  if (Array.isArray(ethereum.providers)) {
+    const coinbase = ethereum.providers.find((p: any) => p.isCoinbaseWallet);
+    if (!coinbase) {
+      console.log("Coinbase Wallet not found among multiple providers");
+    }
+    return coinbase || null;
+  }
+
+  // Case: providerMap (some environments expose this instead of providers[])
+  if (ethereum.providerMap && typeof ethereum.providerMap.get === "function") {
+    const coinbase = ethereum.providerMap.get("CoinbaseWallet");
+    if (!coinbase) {
+      console.log("Coinbase Wallet not found in providerMap");
+    }
+    return coinbase || null;
+  }
+
+  // Case: single provider injected
+  if (!ethereum.isCoinbaseWallet) {
+    console.log("Single provider injected, but it is not Coinbase Wallet");
+    return null;
+  }
+
+  return ethereum as CoinbaseEthereumProvider;
+}
+
+export async function connectCoinbaseWallet() {
   const coinbaseWallet = new CoinbaseWalletSDK({
     appName: "Aaarto NFT Minting",
     appLogoUrl: "https://aaarto.art/logo.png",
   });
 
-  const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider;
-console.log('a', ethereum)
-  // Show "connecting" message in UI immediately
-  // (don't return here, just inform the UI)
-  if (!window.ethereum || !window.ethereum.request || !window.ethereum.isCoinbaseWallet) {
-    console.log("Extension not detected — popup will show, inform user of options");
-    // e.g. setErrorMessage("Use mobile app or install extension")
-    // but DO NOT return, let request run
-  }
-console.log('b' )
+  const ethereum = getCoinbaseProvider() 
+    ?? (coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider);
+
+  console.log("Connecting with Coinbase provider:", ethereum);
 
   try {
     const accounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
-console.log('c', accounts )
 
     if (!accounts || accounts.length === 0) {
-      throw new Error("no_accounts");
+      return { status: "no_accounts", ethereum };
     }
 
-    return { ethereum, account: accounts[0], status: '' };
+    return { status: "connected", ethereum, account: accounts[0] };
   } catch (err: any) {
-    console.error("Coinbase Wallet extension not responding", err);
-    throw new Error("not_installed");
+    console.error("Coinbase Wallet not responding", err);
+    return { status: "not_installed", ethereum };
   }
-};
+}
