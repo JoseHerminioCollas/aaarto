@@ -1,42 +1,38 @@
-// src/coinbaseHelpers.ts
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import config from "./config";
 
-const errorMessages = {
-  // notInstalled: "Coinbase Wallet is not installed or not detected.",
-  alreadyProcessing:
-    "Coinbase Wallet is already processing a request, try opening the Coinbase Wallet application.",
-};
+interface CoinbaseEthereumProvider {
+  request: (args: { method: string; params?: any[] }) => Promise<any>;
+  isCoinbaseWallet?: boolean;
+}
 
-// Create a Coinbase Wallet SDK instance
-const coinbaseWallet = new CoinbaseWalletSDK({
-  appName: "Aaarto NFT Minting",
-  appLogoUrl: "https://aaarto.art/logo.png",
-});
-
-// Create the provider once
-const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl);
-
-// Function 1: check installation
-export const checkCoinbaseInstall = () => {
-  const { ethereum } = window as any;
-  if (!ethereum || !ethereum.request || !ethereum.isCoinbaseWallet) {
-    throw new Error("not_installed");
+export const connectCoinbaseWallet = async () => {
+  const coinbaseWallet = new CoinbaseWalletSDK({
+    appName: "Aaarto NFT Minting",
+    appLogoUrl: "https://aaarto.art/logo.png",
+  });
+    const ethereum = coinbaseWallet.makeWeb3Provider(config.rpcUrl) as CoinbaseEthereumProvider;
+console.log('a')
+  if (!window.ethereum || !window.ethereum.request || !window.ethereum.isCoinbaseWallet) {
+    console.log("Coinbase Wallet extension not detected");
+    // throw new Error("not_installed");
+    // TODO show message, do not throw error
   }
-};
-
-// Function 2: request accounts
-export const requestAccounts = async (): Promise<string> => {
   try {
     const accounts = (await ethereum.request({
       method: "eth_requestAccounts",
     })) as string[];
+console.log('b')
 
-    return accounts.join(" | ");
-  } catch (error: any) {
-    if (error.message?.includes("Already processing eth_requestAccounts")) {
-      throw new Error(errorMessages.alreadyProcessing);
+    if (!accounts || accounts.length === 0) {
+console.log('c')
+      throw new Error("no_accounts");
     }
-    throw error;
+
+    return { ethereum, account: accounts[0] };
+  } catch (err: any) {
+    // If the extension isn’t installed, this request will fail
+    console.error("Coinbase Wallet extension not detected or not responding", err);
+    throw new Error("not_installed");
   }
 };

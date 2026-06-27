@@ -10,8 +10,8 @@ import AaartoModal from "@components/AaartoModal";
 import AboutInfo from "./AboutInfo";
 import MintingInfo from "./MintingInfo";
 import uploadData from "../uploadData";
-import { checkCoinbaseInstall, requestAccounts } from "../coinbaseHelpers";
-import mintNFT from "../mintNFT";
+import { connectCoinbaseWallet } from "../coinbaseHelpers";
+import { mintNFT } from "../mintNFT";
 import config from "../config";
 import NoWalletModal from "./NoWalletModal";
 
@@ -33,13 +33,15 @@ const errorMessages = {
   userCancel: "The request has been cancelled.",
   alreadyProcessing:
     "Coinbase Wallet is processing a request, try opening Coinbase Wallet",
-  InsufficientFunds: "Insufficient funds, please add more funds to your wallet.",
-  };
+  InsufficientFunds:
+    "Insufficient funds, please add more funds to your wallet.",
+};
 const normalizeMintError = (error: any, errorMessages: any): string => {
   if (error.message?.includes("insufficient funds"))
     return errorMessages.InsufficientFunds;
   if (error.message?.includes("user rejected")) return errorMessages.userCancel;
-  if(error.message?.includes("not_installed")) return errorMessages.notInstalled;
+  if (error.message?.includes("not_installed"))
+    return errorMessages.notInstalled;
   return `errorMessages.general ${error}`;
 };
 
@@ -88,15 +90,17 @@ const App: React.FC = () => {
       //   description,
       //   artistName
       // );
-      console.log("a");
-      checkCoinbaseInstall();
-      console.log("b");
-      const account = await requestAccounts();
+      const { ethereum, account } = await connectCoinbaseWallet();
       setAccount(account);
-      const transactionHash = await mintNFT(`ipfs://${ipfsHashMD}`);
-      if (transactionHash) {
-        setTransactionHash(transactionHash);
-      }
+      const txHash = await mintNFT(ethereum, account, `ipfs://${ipfsHashMD}`);
+      setTransactionHash(txHash);
+      // checkCoinbaseInstall();
+      // const account = await requestAccounts();
+      // setAccount(account);
+      // const transactionHash = await mintNFT(`ipfs://${ipfsHashMD}`);
+      // if (transactionHash) {
+      //   setTransactionHash(transactionHash);
+      // }
       setIsMinting(false);
     } catch (error: any) {
       setMintingError(normalizeMintError(error, errorMessages));
