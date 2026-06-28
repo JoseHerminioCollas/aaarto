@@ -14,6 +14,7 @@ import uploadData from "../uploadData";
 import { connectCoinbaseWallet } from "../coinbaseHelpers";
 import { mintNFT } from "../mintNFT";
 import config from "../config";
+console.log('config', config);
 
 const aboutStyles = mergeStyleSets({
   button: {
@@ -109,6 +110,7 @@ const App: React.FC = () => {
       // );
 
       const result = await connectCoinbaseWallet(openNoWalletModal);
+      // show state in modal or in header
       console.log("result", result);
       // Only runs if connected
       const txHash = await mintNFT(

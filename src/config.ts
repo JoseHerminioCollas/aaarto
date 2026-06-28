@@ -12,7 +12,7 @@ let config: any;
 // const windowEnv: WindowEnv = { network: "polygon", platformFee: "0.001" };
 // window.env = windowEnv;
 // set default values
-let platformFee = "0.001";
+let platformFee = "0.0001";
 let network: Network = "sepolia";
 const chainNames: Record<Network, string> = {
   sepolia: "Sepolia Ether",
