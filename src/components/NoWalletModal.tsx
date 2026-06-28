@@ -17,43 +17,32 @@ const NoWallet: React.FC<NoWalletProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>Choose How to Connect</h2>
-        <p>
-          No Coinbase Wallet extension was found. You can still mint your Aaarto
-          NFT:
-        </p>
-        <ul>
-          <li>
-            <strong>Use Coinbase Wallet mobile app</strong> — scan the QR code
-            below to connect instantly.
-          </li>
-          <li>
-            <strong>Install Coinbase Wallet extension</strong> — for desktop
-            users who prefer browser‑based minting.
-          </li>
-        </ul>
-
-        {/* QR code placeholder */}
-        <div id="qrCodeContainer">
-          {/* Replace with dynamic QR code from SDK */}
-          <img
-            src="qr-placeholder.png"
-            alt="Scan with Coinbase Wallet mobile app"
-            style={{ width: "200px", margin: "20px auto" }}
-          />
-        </div>
-
-        <div className="modal-actions">
-          <button className="primary" onClick={onScanMobile}>
-            Scan with Mobile App
-          </button>
-          <button className="secondary" onClick={onInstallExtension}>
-            Install Extension
-          </button>
-          <button className="secondary" onClick={onClose}>
-            Cancel
-          </button>
+      <div className="modal">
+        <div className="modal-content">
+          <h2>Connect Your Wallet</h2>
+          <p>
+            We didn’t find the Coinbase Wallet browser extension. You can still
+            mint your Aaarto NFT by choosing one of these options:
+          </p>
+          <ul>
+            <li>
+              <strong>Use the Base mobile app</strong>— scan the QR code in the
+              pop up displayed.
+            </li>
+            <li>
+              <strong>Install the Coinbase Wallet extension</strong> — for
+              desktop users who prefer browser‑based minting.
+            </li>
+          </ul>
+          {/* <div className="qr-section">
+            <p>Scan with Base app:</p>
+            <img id="qr" src="" alt="WalletConnect QR code" />
+          </div> */}
+          {/* <div className="modal-actions">
+            <button className="primary">Scan with Base app</button>
+            <button className="secondary">Install Extension</button>
+            <button className="secondary">Cancel</button>
+          </div> */}
         </div>
       </div>
 
