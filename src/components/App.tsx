@@ -109,17 +109,21 @@ const App: React.FC = () => {
       // );
 
       const result = await connectCoinbaseWallet(openNoWalletModal);
+      console.log("result", result);
       // Only runs if connected
       const txHash = await mintNFT(
         result.ethereum,
         result.account,
         `ipfs://${ipfsHashMD}`,
       );
+      console.log("txHash", txHash);
       setTransactionHash(txHash);
 
       setIsMinting(false);
     } catch (error: any) {
+      console.log("error", error);
       setMintingError(normalizeMintError(error, errorMessages));
+      setModalContent("minting");
       setIsMinting(false);
     }
   };

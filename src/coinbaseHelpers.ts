@@ -4,6 +4,8 @@ import config from "./config";
 interface CoinbaseEthereumProvider {
   request: (args: { method: string; params?: any[] }) => Promise<any>;
   isCoinbaseWallet?: boolean;
+  on?: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
 }
 
 function getCoinbaseProvider(
@@ -26,7 +28,7 @@ function getCoinbaseProvider(
     return coinbase || null;
   }
 
-  // Case: providerMap (some environments expose this instead of providers[])
+  // Case: providerMap
   if (ethereum.providerMap && typeof ethereum.providerMap.get === "function") {
     const coinbase = ethereum.providerMap.get("CoinbaseWallet");
     if (!coinbase) {
@@ -46,10 +48,7 @@ function getCoinbaseProvider(
   return ethereum as CoinbaseEthereumProvider;
 }
 
-export async function connectCoinbaseWallet(openNoWalletModal: {
-  (): void;
-  (): void;
-}) {
+export async function connectCoinbaseWallet(openNoWalletModal: () => void) {
   const coinbaseWallet = new CoinbaseWalletSDK({
     appName: "Aaarto NFT Minting",
     appLogoUrl: "https://aaarto.art/logo.png",
@@ -69,6 +68,23 @@ export async function connectCoinbaseWallet(openNoWalletModal: {
 
   if (!accounts || accounts.length === 0) {
     throw new Error("no_accounts");
+  }
+
+  console.log("Connected account:", accounts[0]);
+
+  // Event listeners for future UI integration
+  if (ethereum.on) {
+    ethereum.on("accountsChanged", (accs: string[]) => {
+      console.log("Accounts changed:", accs);
+    });
+
+    ethereum.on("chainChanged", (chainId: string) => {
+      console.log("Chain changed:", chainId);
+    });
+
+    ethereum.on("disconnect", (error: any) => {
+      console.log("Disconnected from Coinbase Wallet:", error);
+    });
   }
 
   return { ethereum, account: accounts[0] };
