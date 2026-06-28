@@ -14,7 +14,7 @@ import uploadData from "../uploadData";
 import { connectCoinbaseWallet } from "../coinbaseHelpers";
 import { mintNFT } from "../mintNFT";
 import config from "../config";
-console.log('config', config);
+console.log("config", config);
 
 const aboutStyles = mergeStyleSets({
   button: {
@@ -38,12 +38,19 @@ const errorMessages = {
     "Insufficient funds, please add more funds to your wallet.",
 };
 const normalizeMintError = (error: any, errorMessages: any): string => {
-  if (error.message?.includes("insufficient funds"))
+  const msg = (error.message || "").toLowerCase();
+
+  if (msg.includes("insufficient funds")) {
     return errorMessages.InsufficientFunds;
-  if (error.message?.includes("user rejected")) return errorMessages.userCancel;
-  if (error.message?.includes("not_installed"))
+  }
+  if (msg.includes("user rejected")) {
+    return errorMessages.userCancel;
+  }
+  if (msg.includes("not_installed")) {
     return errorMessages.notInstalled;
-  return `errorMessages.general ${error}`;
+  }
+
+  return `${errorMessages.general} ${error}`;
 };
 
 const App: React.FC = () => {
@@ -100,14 +107,14 @@ const App: React.FC = () => {
     setAccount(null);
     setTransactionHash(null);
     setMintingError(null);
-    const ipfsHashMD = "x";
+
     try {
-      // const ipfsHashMD = await uploadData(
-      //   svgString,
-      //   name,
-      //   description,
-      //   artistName
-      // );
+      const ipfsHashMD = await uploadData(
+        svgString,
+        name,
+        description,
+        artistName
+      );
 
       const result = await connectCoinbaseWallet(openNoWalletModal);
       // show state in modal or in header
