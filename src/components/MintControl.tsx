@@ -30,9 +30,12 @@ export type MintControlProps = {
 const MintControl: React.FC<MintControlProps> = ({ handleMint, isMinting }) => {
   return (
     <section className={mintControlStyles.container}>
-      <button onClick={handleMint} disabled={isMinting}>
-        {isMinting ? labels.minting : labels.mint}
+      <button disabled={true}>
+        Minting Temporarily Disabled
       </button>
+      {/* <button onClick={handleMint} disabled={isMinting}>
+        {isMinting ? labels.minting : labels.mint}
+      </button> */}
     </section>
   );
 };
