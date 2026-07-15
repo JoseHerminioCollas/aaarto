@@ -1,5 +1,7 @@
 // public/env.js
 window.env = {
-  network: "polygon",
-  platformFee: "3.0",
+  network: "sepolia",
+  platformFee: "0.001",
+  // network: "polygon",
+  // platformFee: "3.0",
 };

@@ -25,6 +25,16 @@ if (window.env) {
   network = window.env.network as Network;
   chainName = chainNames[network];
 }
+console.log(
+  "window.env",
+  window.env,
+  "network",
+  network,
+  "platformFee",
+  platformFee,
+  "chainName",
+  chainName,
+);
 if (network === "sepolia") {
   config = {
     chainNameDisplay: chainName,

@@ -14,10 +14,6 @@ import mintNFT from "../mintNFT";
 import checkMetaMaskInstall from "../checkMetaMaskInstall";
 import requestAccounts from "../requestAccounts";
 
-// use with ?env=dev to enable minting, otherwise minting is disabled
-const params = new URLSearchParams(window.location.search);
-const isMintDisabled = !params.has("env");
-
 const aboutStyles = mergeStyleSets({
   button: {
     backgroundColor: "darkgreen",
@@ -65,14 +61,12 @@ const App: React.FC = () => {
     setAccount(null);
     setTransactionHash(null);
     setMintingError(null);
-    console.log("isMintDisabled :", isMintDisabled );
     try {
-      let ipfsHashMD = "xx";
+      // let ipfsHashMD = "xx";
       // !! temporarily disable minting and upload data to IPFS if minting is disabled
-      if (isMintDisabled) {
-        console.log("Uploading data to IPFS");
-        ipfsHashMD = await uploadData(svgString, name, description, artistName);
-      }
+      // if (isMintDisabled) {
+      const  ipfsHashMD = await uploadData(svgString, name, description, artistName);
+      // }
       console.log("IPFS Hash:", ipfsHashMD);
       // Check if MetaMask is installed, if not throw error
       checkMetaMaskInstall();
