@@ -1,6 +1,10 @@
 import React from "react";
 import { mergeStyleSets } from "@fluentui/react";
 
+// use with ?env=dev to enable minting, otherwise minting is disabled
+const params = new URLSearchParams(window.location.search);
+const isMintDisabled = !params.has("env");
+
 const mintControlStyles = mergeStyleSets({
   container: {
     backgroundColor: "lightblue",
@@ -30,12 +34,14 @@ export type MintControlProps = {
 const MintControl: React.FC<MintControlProps> = ({ handleMint, isMinting }) => {
   return (
     <section className={mintControlStyles.container}>
-      <button disabled={true}>
-        Minting Temporarily Disabled
-      </button>
-      {/* <button onClick={handleMint} disabled={isMinting}>
-        {isMinting ? labels.minting : labels.mint}
-      </button> */}
+      {isMintDisabled && (
+        <button disabled={true}>Minting Temporarily Disabled</button>
+      )}
+      {!isMintDisabled && (
+        <button onClick={handleMint} disabled={isMinting}>
+          {isMinting ? labels.minting : labels.mint}
+        </button>
+      )}
     </section>
   );
 };
