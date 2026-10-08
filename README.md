@@ -45,7 +45,13 @@ The steps use a block explorer: Etherscan for Sepolia, Polygonscan for Polygon.
 
 1. **Find the token ID and the metadata address in the `Mint` log.** Open the mint transaction on the block explorer (the link in the success dialog) and choose the **Logs** tab. A mint produces five logs. The last one has the Aaarto contract as its address (see the table below) and is labelled `Mint`.
    - **Topic 2** is the token ID in hexadecimal (`0x…3e` is 62).
-   - **Data** holds the metadata address as hex text, in 32-byte rows. The first row is an offset and the second is the length. The rows after them are the text of `ipfs://<metadata CID>`. Set each of those rows to **Text** in its dropdown and join them. For token 62 the rows read `ipfs://bafkreiefvdklyc6majytsgon`, `pk5ebou2tkwtpbijbgff6systshkzfdr` and `5a`.
+   - **Data** holds the metadata address as hex, in 32-byte rows. The first row is an offset and the second is the length. The last three rows are the text of `ipfs://<metadata CID>`. The explorer's row dropdown offers only Hex and Dec, so copy those three rows from the page (do not retype them), join them into one string, and decode it with a hex-to-text converter or in a terminal:
+
+     ```bash
+     echo '<row 3><row 4><row 5>' | xxd -r -p | tr -d '\0'; echo
+     ```
+
+     For token 62 the result is `ipfs://bafkreiefvdklyc6majytsgonpk5ebou2tkwtpbijbgff6systshkzfdr5a`.
    - The explorer may label the topic and data "amount" and "refBillNo". Those names come from a different contract with the same event signature and are wrong for Aaarto. The contract calls them `tokenID` and `tokenURI`.
 
 2. **Or call `tokenURI` as a check.** `tokenURI(<token ID>)` on the Aaarto contract returns the same `ipfs://<metadata CID>`. If the contract is verified on the block explorer, use its "Read Contract" tab. The Sepolia contract is not verified, so there are two other ways:
